@@ -1,4 +1,4 @@
-package com.birdhousecheck;
+package com.birdhousestatus;
 
 import com.google.inject.Provides;
 import javax.inject.Inject;
@@ -24,9 +24,9 @@ import static net.runelite.api.NullObjectID.NULL_30568;
 
 @Slf4j
 @PluginDescriptor(
-		name = "Birdhouse Check"
+	name = "Birdhouse Status"
 )
-public class BirdhouseCheckPlugin extends Plugin
+public class BirdhouseStatusPlugin extends Plugin
 {
 	private static final int MEADOW_NORTH = NULL_30565;
 	private static final int MEADOW_SOUTH = NULL_30566;
@@ -37,10 +37,10 @@ public class BirdhouseCheckPlugin extends Plugin
 	private Client client;
 
 	@Inject
-	private BirdhouseCheckConfig config;
+	private BirdhouseStatusConfig config;
 
 	@Inject
-	private BirdhouseCheckOverlay overlay;
+	private BirdhouseStatusOverlay overlay;
 
 	@Getter(AccessLevel.PACKAGE)
 	private GameObject meadowNorth;
@@ -58,7 +58,7 @@ public class BirdhouseCheckPlugin extends Plugin
 	protected void startUp() throws Exception
 	{
 		overlayManager.add(overlay);
-		log.info("Birdhouse Check started!");
+		log.info("Birdhouse Status started!");
 	}
 
 	@Override
@@ -69,13 +69,13 @@ public class BirdhouseCheckPlugin extends Plugin
 		meadowSouth = null;
 		valleyNorth = null;
 		valleySouth = null;
-		log.info("Birdhouse Check stopped!");
+		log.info("Birdhouse Status stopped!");
 	}
 
 	@Provides
-	BirdhouseCheckConfig provideConfig(ConfigManager configManager)
+	BirdhouseStatusConfig provideConfig(ConfigManager configManager)
 	{
-		return configManager.getConfig(BirdhouseCheckConfig.class);
+		return configManager.getConfig(BirdhouseStatusConfig.class);
 	}
 
 	@Subscribe
