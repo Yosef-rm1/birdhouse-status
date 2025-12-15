@@ -7,3 +7,17 @@ build
 nbactions.xml
 nb-configuration.xml
 nbproject/
+
+# macOS
+.DS_Store
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Gradle
+.gradle/
+build/
+
+# Java
+*.class.DS_Store
