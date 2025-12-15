@@ -8,37 +8,28 @@ import net.runelite.client.config.ConfigSection;
 @ConfigGroup("birdhousestatus")
 public interface BirdhouseStatusConfig extends Config
 {
-	@ConfigSection(
-			name = "Icon Settings",
-			description = "Configure icon size",
-			position = 0
-	)
-	String iconSection = "iconSection";
-
-	@ConfigSection(
-			name = "Seeded Birdhouse",
-			description = "Settings for seeded birdhouses",
-			position = 1
-	)
-	String seededSection = "seededSection";
-
-	@ConfigSection(
-			name = "Needs Seeds",
-			description = "Settings for birdhouses that need seeds",
-			position = 2
-	)
-	String needsSeedsSection = "needsSeedsSection";
 
 	@ConfigItem(
 			keyName = "iconSize",
 			name = "Icon size",
 			description = "The size of icons displayed on birdhouses",
-			position = 0,
-			section = iconSection
+			position = 0
 	)
 	default IconSize iconSize()
 	{
 		return IconSize.MEDIUM;
+	}
+
+	// Needs seeds section
+	@ConfigItem(
+			keyName = "showNeedsSeedsIcon",
+			name = "Show Needs Seeds Icon",
+			description = "Display a warning icon on birdhouses that need seeds",
+			position = 1
+	)
+	default boolean showNeedsSeedsIcon()
+	{
+		return true;
 	}
 
 	// Seeded section
@@ -46,8 +37,7 @@ public interface BirdhouseStatusConfig extends Config
 			keyName = "showSeededIcon",
 			name = "Show Seeded Icon",
 			description = "Display a seed icon on birdhouses that have been seeded",
-			position = 0,
-			section = seededSection
+			position = 2
 	)
 	default boolean showSeededIcon()
 	{
@@ -58,24 +48,10 @@ public interface BirdhouseStatusConfig extends Config
 			keyName = "seedType",
 			name = "Seed icon type",
 			description = "Which seed icon to display for seeded birdhouses",
-			position = 1,
-			section = seededSection
+			position = 3
 	)
 	default SeedType seedType()
 	{
 		return SeedType.HAMMERSTONE;
-	}
-
-	// Needs seeds section
-	@ConfigItem(
-			keyName = "showNeedsSeedsIcon",
-			name = "Show Needs Seeds Icon",
-			description = "Display a warning icon on birdhouses that need seeds",
-			position = 0,
-			section = needsSeedsSection
-	)
-	default boolean showNeedsSeedsIcon()
-	{
-		return true;
 	}
 }
