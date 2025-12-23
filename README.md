@@ -14,11 +14,11 @@ A RuneLite plugin that displays icons on birdhouses to show their current status
 
 # Screenshots
 
-![Screenshot 1](images/screenshot1.png)
-![Screenshot 2](images/screenshot2.png)
-![Screenshot 3](images/screenshot3.png)
-![Screenshot 4](images/screenshot4.png)
-![Screenshot 5](images/screenshot5.png)
+![Screenshot 1](images/Screenshot1.png)
+![Screenshot 2](images/Screenshot2.png)
+![Screenshot 3](images/Screenshot3.png)
+![Screenshot 4](images/Screenshot4.png)
+![Screenshot 5](images/Screenshot5.png)
 
 # Installation
 
