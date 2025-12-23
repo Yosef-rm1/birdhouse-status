@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.Objects;
 import javax.inject.Inject;
@@ -30,7 +31,7 @@ import static net.runelite.api.VarPlayer.BIRD_HOUSE_VALLEY_SOUTH;
 public class BirdhouseStatusOverlay extends Overlay
 {
     private static final int ICON_HEIGHT_OFFSET = 150;
-    
+
     private final Client client;
     private final BirdhouseStatusConfig config;
     private final BirdhouseStatusPlugin plugin;
@@ -44,6 +45,10 @@ public class BirdhouseStatusOverlay extends Overlay
     // Warning icon for "needs seeds"
     private BufferedImage warningImage;
     private int cachedWarningSize;
+
+    // Done icon for "ready to harvest"
+    private BufferedImage doneImage;
+    private int cachedDoneSize;
 
     @Inject
     BirdhouseStatusOverlay(Client client, BirdhouseStatusConfig config, BirdhouseStatusPlugin plugin, ItemManager itemManager)
@@ -69,17 +74,23 @@ public class BirdhouseStatusOverlay extends Overlay
         int size = config.iconSize().getSize();
         updateSeedImage(size);
         updateWarningImage(size);
+        updateDoneImage(size);
 
         // Check each birdhouse location
-        renderBirdhouse(graphics, wv, plugin.getMeadowNorth(), client.getVarpValue(BIRD_HOUSE_MEADOW_NORTH));
-        renderBirdhouse(graphics, wv, plugin.getMeadowSouth(), client.getVarpValue(BIRD_HOUSE_MEADOW_SOUTH));
-        renderBirdhouse(graphics, wv, plugin.getValleyNorth(), client.getVarpValue(BIRD_HOUSE_VALLEY_NORTH));
-        renderBirdhouse(graphics, wv, plugin.getValleySouth(), client.getVarpValue(BIRD_HOUSE_VALLEY_SOUTH));
+        renderBirdhouse(graphics, wv, plugin.getMeadowNorth(),
+                client.getVarpValue(BIRD_HOUSE_MEADOW_NORTH), BirdhouseLocation.MEADOW_NORTH);
+        renderBirdhouse(graphics, wv, plugin.getMeadowSouth(),
+                client.getVarpValue(BIRD_HOUSE_MEADOW_SOUTH), BirdhouseLocation.MEADOW_SOUTH);
+        renderBirdhouse(graphics, wv, plugin.getValleyNorth(),
+                client.getVarpValue(BIRD_HOUSE_VALLEY_NORTH), BirdhouseLocation.VALLEY_NORTH);
+        renderBirdhouse(graphics, wv, plugin.getValleySouth(),
+                client.getVarpValue(BIRD_HOUSE_VALLEY_SOUTH), BirdhouseLocation.VALLEY_SOUTH);
 
         return null;
     }
 
-    private void renderBirdhouse(Graphics2D graphics, WorldView wv, GameObject gameObject, int state)
+    private void renderBirdhouse(Graphics2D graphics, WorldView wv, GameObject gameObject,
+                                 int state, BirdhouseLocation location)
     {
         if (Objects.isNull(gameObject) || state == 0)
         {
@@ -96,14 +107,26 @@ public class BirdhouseStatusOverlay extends Overlay
         boolean isSeeded = isSeeded(state);
         boolean needsSeeds = needsSeeds(state);
 
-        // Render seed icon if seeded
-        if (isSeeded && config.showSeededIcon() && seedImage != null)
+        // Priority: Done > Seeded > Needs Seeds
+        if (isSeeded)
         {
-            OverlayUtil.renderImageLocation(client, graphics, lp, seedImage, ICON_HEIGHT_OFFSET);
+            // Check if birdhouse is done (using Time Tracking data)
+            boolean isDone = plugin.isBirdhouseDone(location);
+
+            if (isDone && config.showDoneIcon() && doneImage != null)
+            {
+                // Show green checkmark when ready to harvest
+                OverlayUtil.renderImageLocation(client, graphics, lp, doneImage, ICON_HEIGHT_OFFSET);
+            }
+            else if (config.showSeededIcon() && seedImage != null)
+            {
+                // Show seed icon while waiting
+                OverlayUtil.renderImageLocation(client, graphics, lp, seedImage, ICON_HEIGHT_OFFSET);
+            }
         }
-        // Render warning icon if needs seeds
         else if (needsSeeds && config.showNeedsSeedsIcon() && warningImage != null)
         {
+            // Render warning icon if needs seeds
             OverlayUtil.renderImageLocation(client, graphics, lp, warningImage, ICON_HEIGHT_OFFSET);
         }
     }
@@ -153,6 +176,15 @@ public class BirdhouseStatusOverlay extends Overlay
         }
     }
 
+    private void updateDoneImage(int size)
+    {
+        if (doneImage == null || cachedDoneSize != size)
+        {
+            doneImage = createDoneIcon(size);
+            cachedDoneSize = size;
+        }
+    }
+
     /**
      * Creates a simple exclamation mark warning icon.
      */
@@ -160,15 +192,16 @@ public class BirdhouseStatusOverlay extends Overlay
     {
         BufferedImage image = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = image.createGraphics();
-        
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
         // Yellow/orange background circle
         g.setColor(new Color(255, 180, 0));
         g.fillOval(0, 0, size, size);
-        
+
         // Dark border
         g.setColor(new Color(100, 70, 0));
         g.drawOval(0, 0, size - 1, size - 1);
-        
+
         // Black exclamation mark
         g.setColor(Color.BLACK);
         g.setFont(new Font("Arial", Font.BOLD, (int)(size * 0.7)));
@@ -177,7 +210,37 @@ public class BirdhouseStatusOverlay extends Overlay
         int textX = (size - fm.stringWidth(text)) / 2;
         int textY = (size - fm.getHeight()) / 2 + fm.getAscent();
         g.drawString(text, textX, textY);
-        
+
+        g.dispose();
+        return image;
+    }
+
+    /**
+     * Creates a green checkmark icon for completed birdhouses.
+     */
+    private BufferedImage createDoneIcon(int size)
+    {
+        BufferedImage image = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = image.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        // Green background circle
+        g.setColor(new Color(34, 177, 76));
+        g.fillOval(0, 0, size, size);
+
+        // Dark green border
+        g.setColor(new Color(0, 100, 0));
+        g.drawOval(0, 0, size - 1, size - 1);
+
+        // White checkmark
+        g.setColor(Color.WHITE);
+        g.setFont(new Font("Arial", Font.BOLD, (int)(size * 0.7)));
+        FontMetrics fm = g.getFontMetrics();
+        String text = "✓";
+        int textX = (size - fm.stringWidth(text)) / 2;
+        int textY = (size - fm.getHeight()) / 2 + fm.getAscent();
+        g.drawString(text, textX, textY);
+
         g.dispose();
         return image;
     }

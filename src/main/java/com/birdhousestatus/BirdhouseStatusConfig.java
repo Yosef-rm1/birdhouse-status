@@ -44,11 +44,20 @@ public interface BirdhouseStatusConfig extends Config
 		return true;
 	}
 
+	// Done section
+	@ConfigItem(
+			keyName = "showDoneIcon",
+			name = "Show Done Icon",
+			description = "Display a done icon on birdhouses that are done",
+			position = 3
+	)
+	default boolean showDoneIcon() { return true;}
+
 	@ConfigItem(
 			keyName = "seedType",
 			name = "Seed icon type",
 			description = "Which seed icon to display for seeded birdhouses",
-			position = 3
+			position = 4
 	)
 	default SeedType seedType()
 	{

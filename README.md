@@ -4,9 +4,13 @@ A RuneLite plugin that displays icons on birdhouses to show their current status
 
 # Features
 
+- Done Icon - Shows a green checkmark when a birdhouse is ready to harvest
 - Seed Icon - Shows when a birdhouse has been seeded and is catching birds
 - Warning Icon - Shows a yellow "!" when a birdhouse needs seeds
 - Configurable - Choose icon size and seed icon type
+
+# Requirements
+- Time Tracking plugin must be enabled (for the done icon to work)
 
 # Screenshots
 
@@ -23,6 +27,10 @@ This plugin is available in the [RuneLite Plugin Hub](https://runelite.net/plugi
 - Seed icon for seeded birdhouses
 - Warning icon for birdhouses needing seeds
 - Configurable icon size and seed type
+
+# v1.1.0
+- Added green checkmark icon for birdhouses ready to harvest
+- Integration with Time Tracking plugin
 
 ## Author
 
